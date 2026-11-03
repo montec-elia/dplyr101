@@ -753,3 +753,47 @@ Is (Ideal, E, 3903) the description of a statistical unit wrt some variables?
    b) moving from tidy to untidy and back again is quite common
 2) spliting the content of a cell
 
+## Untidying for readability
+
+```{r}
+diamonds_counts |>
+  pivot_wider(id_cols = color, names_from = cut, values_from = `n()`)
+```
+
+## Pivot wider principles
+
+- `id_cols`: identified the statistical unit, one per unique value in the column(s)
+- `names_from`: the column that contains the names of the characteristics of the statistical units
+- `values_from`: the column that contains the values of the characteristics of the statistical units
+
+Generic example: (id1, id2, ..., idn, name, value)
+
+```{r}
+#| message: false
+le_who_raw <- vroom(here("data","life expectancy raw.csv"))
+```
+
+## Who example {.smaller}
+
+```{r}
+#| echo: true
+le_who_raw |> 
+  pivot_wider(id_cols = c(Location, Period),
+              names_from = c(Indicator, Dim1),
+              values_from = Value) |>
+  select(Location, Period,  `Life expectancy at birth (years)_Male`) |>
+  slice_min(`Life expectancy at birth (years)_Male`, n = 5)
+```
+## Who example {.smaller}
+
+```{r}
+#| echo: true
+le_who_raw |> 
+  pivot_wider(id_cols = c(Location, Period),
+              names_from = c(Indicator, Dim1),
+              values_from = Value) |>
+  filter(Location == "France") |>
+  ggplot(aes(x=Period, y=`Life expectancy at birth (years)_Female`)) +
+  geom_line()
+```
+

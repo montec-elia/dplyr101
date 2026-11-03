@@ -891,3 +891,38 @@ weekly_sales |>
   
 ```
 
+```{r}
+#| message: false
+planets <- vroom(here("data","planets.csv"))
+stars <- vroom(here("data","stars.csv"))
+```
+
+
+## Dealing with multiple values in one cell
+
+- `separate_longer_delim` is adapted to situations where the number of values in a cell can
+  vary a lot between statistical units
+- `separate_wider_delim` is dedicated to cases where the number of values in a cell is
+ almost always the same
+ 
+## Planet example {.smaller}
+
+```{r}
+#| echo: true
+planets |>
+  select(PLANET_CODE, Type_terrain) |>
+  separate_longer_delim(Type_terrain, ";") |>
+  slice_head(n = 5)
+```
+## Star example {.smaller}
+
+```{r}
+#| echo: true
+stars |>
+  separate_wider_delim(`STAR TYPE`, 
+                       names=c("class", "magnitude", "luminosity"), 
+                       delim=";") |>
+  select(Star, class, magnitude, luminosity) |>
+  slice_sample(n=5)
+```
+

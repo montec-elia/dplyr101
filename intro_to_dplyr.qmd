@@ -797,3 +797,97 @@ le_who_raw |>
   geom_line()
 ```
 
+## Pivot longer
+
+`pivot_longer` can be considered as the reverse operation of `pivot_wider`:
+
+- wide format (more or less the standard tidy format)
+- long format: a small number of columns and statistical units spread over 
+  multiple rows (typical WHO format, for instance)
+  - each row contains a way to identify the statistical unit
+  - each row contains a way to identify the variable measured on the row
+  
+## Who example {.smaller}
+
+```{r}
+le_who_raw |>
+  filter(Location == "Germany", Indicator =="Life expectancy at birth (years)") |>
+  rename(Population = Dim1) |>
+  ggplot(aes(x=Period, y=Value, color=Population)) +
+  geom_line()
+```
+
+## Benefits of a long format
+
+- variable selection via `filter` (rather than with `select`)
+- variable group selection via `filter` (simpler than with `select` on wide format)
+- group of observations or variables can be identified by some columns: 
+  enables us to use ggplot grouped representations (multiple lines for instance) 
+- we can implement row oriented operations instead of column oriented operations
+
+
+## Who example {.smaller}
+
+```{r}
+le_who_raw |>
+  filter(Location %in% c("Italy", "Germany", "Greece", "Spain", "France"), 
+         Indicator =="Life expectancy at birth (years)") |>
+  rename(Population = Dim1, Country = Location, "Life exp. at birth"=Value, Year=Period) |>
+  ggplot(aes(x=Year, y=`Life exp. at birth`, color=Country)) +
+  geom_line() +
+  facet_wrap(~Population)
+```
+```{r}
+#| message: false
+weekly_sales <- vroom(here("data","Sales_Transactions_Dataset_Weekly.csv"))
+```
+
+## Pivot longer {.smaller}
+
+::::: columns
+::: {.column width="50%"}
+
+When transforming to a long format, we keep unpivoted identification column(s)
+and we pivot the rest. The result is always structured as follows:
+
+- first the unpivoted column(s) with repeated values
+- then a `name` column
+- and a `value` column
+
+:::
+
+::: {.column width="50%"}
+
+
+```{r}
+#| echo: true
+weekly_sales |> 
+  pivot_longer(!Product_Code) |>
+  slice_sample(n=5)
+```
+:::
+:::::
+
+## Weekly sales example {.smaller}
+
+```{r}
+weekly_sales |> 
+  pivot_longer(!Product_Code) |>
+  filter(startsWith(name, "W")) |>
+  filter(Product_Code %in% c("P1", "P2", "P3")) |>
+  ggplot(aes(x=name, y=value, color=Product_Code, group = Product_Code)) +
+  geom_line()
+```
+
+## Weekly sales example {.smaller}
+
+```{r}
+#| echo: true
+weekly_sales |> 
+  select(Product_Code | starts_with("W")) |>
+  pivot_longer(!Product_Code) |>
+  summarise(total_qty=sum(value), median_qty=median(value), .by=Product_Code) |>
+  slice_max(median_qty, n=5)
+  
+```
+

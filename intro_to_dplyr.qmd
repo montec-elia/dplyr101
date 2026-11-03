@@ -1,5 +1,5 @@
 ---
-title: "Introduction to dplyr"
+title: "Introduction to dplyr and tidyr"
 author: "Fabrice Rossi"
 format: 
   revealjs:
@@ -479,7 +479,6 @@ diamonds |>
 
 ## Conditional frequencies {.smaller}
 
-
 ::::: columns
 ::: {.column width="40%"}
 ```{r}
@@ -549,7 +548,7 @@ diamonds |>
   slice_max(carat, by = cut)
 ```
 
-## Other slice functions  {.smaller}
+## Other slice functions {.smaller}
 
 - `slice_head`: selects rows from the top of the data frame
 - `slice_tail`: selects rows from the bottom of the data frame
@@ -705,4 +704,52 @@ diamonds |>
   slice(1:8)
 ```
 
+# Tidyr main operations
+
+```{r}
+library(tidyr)
+```
+
+
+## Tidy data
+
+Data set with important properties:
+
+1)  each row is a statistical unit (a person)
+2)  each column is a property of statistical units (the weight in kg of person)
+3)  each type of statistical unit is described by a single table (or data frame)
+
+Implicit point: each cell contains a single value
+
+## Ambiguous situations
+
+::::: columns
+::: {.column width="50%"}
+
+```{r}
+diamonds_counts |>
+  slice(1:8)
+```
+
+:::
+
+::: {.column width="50%"}
+
+Is (Ideal, E, 3903) the description of a statistical unit wrt some variables? 
+
+- this is a group of diamonds
+  - cut
+  - colour
+  - size of the group
+- changing the precision of the analysis
+
+:::
+:::::
+
+## Tidyr functionalities
+
+1) pivoting from wide to long and vice versa
+   a) untidy representation of tidy data can be very usefull
+   b) moving from tidy to untidy and back again is quite common
+2) spliting the content of a cell
 
